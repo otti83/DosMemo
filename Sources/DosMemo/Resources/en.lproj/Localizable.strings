@@ -1,0 +1,59 @@
+/* DosMemo — English (default) */
+
+/* Menu bar */
+"menu.file" = "File";
+"menu.file.new" = "New";
+"menu.file.open" = "Open…";
+"menu.file.openRecent" = "Open Recent";
+"menu.file.clearRecent" = "Clear Menu";
+"menu.file.close" = "Close";
+"menu.file.save" = "Save";
+"menu.file.saveAs" = "Save As…";
+
+"menu.find" = "Find";
+"menu.find.find" = "Find…";
+"menu.find.replace" = "Replace…";
+"menu.find.next" = "Find Next";
+"menu.find.previous" = "Find Previous";
+"menu.find.useSelection" = "Use Selection for Find";
+
+"menu.view" = "View";
+"menu.view.zoomIn" = "Zoom In";
+"menu.view.zoomOut" = "Zoom Out";
+"menu.view.zoomReset" = "Actual Size";
+"menu.view.font" = "Font…";
+"menu.view.wrap" = "Word Wrap";
+
+"about" = "About DosMemo";
+
+/* Toolbar */
+"toolbar.file" = "File";
+"toolbar.file.help" = "File operations";
+"toolbar.font" = "Font";
+"toolbar.font.help" = "Font / Size";
+"toolbar.font.section" = "Font";
+"toolbar.font.system" = "System Default (Monospaced)";
+"toolbar.font.other" = "Other Font…";
+"toolbar.size.section" = "Size";
+"toolbar.find" = "Find";
+"toolbar.find.help" = "Find / Replace (⌘F)";
+"toolbar.encoding" = "Encoding";
+"toolbar.encoding.help" = "Text Encoding / Line Endings";
+"toolbar.encoding.section" = "Text Encoding (on save)";
+"toolbar.lineEnding.section" = "Line Endings";
+"toolbar.zoomOut" = "Zoom Out";
+"toolbar.zoomOut.help" = "Zoom Out (⌘-)";
+"toolbar.zoomIn" = "Zoom In";
+"toolbar.zoomIn.help" = "Zoom In (⌘+)";
+"toolbar.wrap" = "Wrap";
+"toolbar.wrap.help" = "Word Wrap (⌘⌥L)";
+
+/* Line endings */
+"lineEnding.lf" = "LF (Unix / macOS)";
+"lineEnding.crlf" = "CRLF (Windows)";
+"lineEnding.cr" = "CR (Classic Mac)";
+
+/* Status bar */
+"status.position" = "Ln %1$@, Col %2$@";
+"status.selection" = "(Selection: %@ chars)";
+"status.counts" = "%1$@ chars / %2$@ lines";
