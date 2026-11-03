@@ -32,4 +32,4 @@ fi
 git push origin "$TAG"
 gh release create "$TAG" "dist/DosMemo-$VERSION-$ARCH.dmg" "dist/DosMemo-$VERSION-$ARCH.dmg.sha256" \
     --repo "$REPO" --verify-tag --title "DosMemo $VERSION" \
-    --notes "macOS 13以降 / $ARCH。DMGを開いてApplicationsへドラッグしてください。このビルドはアドホック署名で、Appleの公証は受けていません。"
+    --notes "macOS 13以降 / ${ARCH}。DMGを開いてApplicationsへドラッグしてください。このビルドはアドホック署名で、Appleの公証は受けていません。"
