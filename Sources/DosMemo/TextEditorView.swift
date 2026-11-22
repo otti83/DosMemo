@@ -4,9 +4,12 @@ import AppKit
 struct TextEditorView: NSViewRepresentable {
     @Binding var text: String
     @Binding var fontSize: CGFloat
-    @Binding var fontName: String?
-    @Binding var wordWrap: Bool
+    var fontName: String?
+    var wordWrap: Bool
     @Binding var metrics: EditorMetrics
+    /// False while the preview covers the editor, so hidden text can't be
+    /// typed into or searched.
+    var isEditable: Bool = true
 
     func makeCoordinator() -> Coordinator {
         Coordinator(self)
@@ -75,7 +78,6 @@ struct TextEditorView: NSViewRepresentable {
 
         context.coordinator.textView = textView
         context.coordinator.scrollView = scrollView
-        context.coordinator.installCommandObserver()
         DispatchQueue.main.async {
             context.coordinator.recomputeMetrics()
         }
@@ -111,6 +113,7 @@ struct TextEditorView: NSViewRepresentable {
         }
 
         context.coordinator.applyWordWrap(wordWrap)
+        context.coordinator.applyEditable(isEditable)
     }
 
     static func preferredFont(name: String?, size: CGFloat) -> NSFont {
@@ -125,86 +128,16 @@ struct TextEditorView: NSViewRepresentable {
         weak var textView: EditorTextView?
         weak var scrollView: NSScrollView?
 
-        private var commandObserver: NSObjectProtocol?
-
         init(_ parent: TextEditorView) {
             self.parent = parent
             super.init()
         }
 
-        deinit {
-            if let commandObserver { NotificationCenter.default.removeObserver(commandObserver) }
-            if NSFontManager.shared.target === self { NSFontManager.shared.target = nil }
-        }
-
-        // MARK: - Menu / toolbar commands
-
-        func installCommandObserver() {
-            commandObserver = NotificationCenter.default.addObserver(
-                forName: EditorCommand.notification, object: nil, queue: .main
-            ) { [weak self] notification in
-                guard let self, let command = EditorCommand(notification) else { return }
-                self.perform(command)
-            }
-        }
-
-        /// Commands are broadcast to every editor; only the key window acts.
-        private func perform(_ command: EditorCommand) {
-            guard let textView, textView.window?.isKeyWindow == true else { return }
-            switch command {
-            case .zoomIn:        handleZoom(delta: 1)
-            case .zoomOut:       handleZoom(delta: -1)
-            case .zoomReset:     setFontSize(AppSettings.baseFontSize)
-            case .showFontPanel: showFontPanel(for: textView)
-            case .toggleWrap:
-                parent.wordWrap.toggle()
-                AppSettings.shared.wordWrap = parent.wordWrap
-            case .find(let action):
-                let item = NSMenuItem()
-                item.tag = action.rawValue
-                textView.performTextFinderAction(item)
-            }
-        }
-
-        private func showFontPanel(for textView: NSTextView) {
-            let manager = NSFontManager.shared
-            manager.setSelectedFont(textView.font ?? .systemFont(ofSize: parent.fontSize), isMultiple: false)
-            manager.target = self
-            manager.action = #selector(changeFont(_:))
-            NSFontPanel.shared.makeKeyAndOrderFront(nil)
-        }
-
-        @objc func changeFont(_ sender: Any?) {
-            let manager = (sender as? NSFontManager) ?? NSFontManager.shared
-            guard let textView = textView else { return }
-            let current = textView.font ?? .systemFont(ofSize: parent.fontSize)
-            let converted = manager.convert(current)
-            let clamped = Self.clampFontSize(converted.pointSize)
-            let finalFont = (clamped == converted.pointSize)
-                ? converted
-                : manager.convert(converted, toSize: clamped)
-            textView.font = finalFont
-            parent.fontName = finalFont.fontName
-            parent.fontSize = finalFont.pointSize
-            AppSettings.shared.fontName = finalFont.fontName
-            AppSettings.shared.defaultFontSize = finalFont.pointSize
-        }
-
-        // MARK: - Zoom
-
+        /// ⌘/⌃-scroll and pinch zoom.
         func handleZoom(delta: CGFloat) {
-            setFontSize(parent.fontSize + delta)
-        }
-
-        private func setFontSize(_ size: CGFloat) {
-            let clamped = Self.clampFontSize(size)
-            guard clamped != parent.fontSize else { return }
-            parent.fontSize = clamped
-            AppSettings.shared.defaultFontSize = clamped
-        }
-
-        private static func clampFontSize(_ size: CGFloat) -> CGFloat {
-            min(max(size, AppSettings.fontSizeRange.lowerBound), AppSettings.fontSizeRange.upperBound)
+            let size = parent.fontSize + delta
+            let clamped = min(max(size, AppSettings.fontSizeRange.lowerBound), AppSettings.fontSizeRange.upperBound)
+            if clamped != parent.fontSize { parent.fontSize = clamped }
         }
 
         // MARK: - Word wrap
@@ -260,6 +193,20 @@ struct TextEditorView: NSViewRepresentable {
             // selection moves a lot inside the marked range.
             if textView.hasMarkedText() { return }
             recomputeMetrics()
+        }
+
+        // MARK: - Editability
+
+        func applyEditable(_ editable: Bool) {
+            guard let textView, textView.isEditable != editable else { return }
+            textView.isEditable = editable
+            textView.isSelectable = editable
+            guard let window = textView.window else { return }
+            if editable {
+                window.makeFirstResponder(textView)
+            } else if window.firstResponder === textView {
+                window.makeFirstResponder(nil)
+            }
         }
 
         // MARK: - Status bar metrics

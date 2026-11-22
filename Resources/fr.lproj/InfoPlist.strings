@@ -1,0 +1,20 @@
+/* Document type and imported type names. */
+"Plain Text" = "Texte";
+"Markdown" = "Markdown";
+"JSON" = "JSON";
+"YAML" = "YAML";
+"XML" = "XML";
+"Property List" = "Plist";
+"HTML" = "HTML";
+"CSS" = "CSS";
+"JavaScript" = "JavaScript";
+"Shell Script" = "Shell";
+"Python Script" = "Python";
+"CSV" = "CSV";
+"TSV" = "TSV";
+"TOML" = "TOML";
+"INI" = "INI";
+"Configuration File" = "Config";
+"Log" = "Journal";
+"Source Code" = "Source";
+"Other File" = "Autre";

@@ -1,12 +1,6 @@
-DosMemo — macOS 13以降
+DosMemo — macOS 13+
 
-DosMemo.app を Applications にドラッグしてインストールしてください。
-
-このビルドは開発者証明書で署名されていますが、Appleの公証は受けていません。
-macOSで開くことがブロックされた場合は、配布元を確認したうえで
-「システム設定 > プライバシーとセキュリティ」の「このまま開く」を使用してください。
-
-Drag DosMemo.app to Applications. Requires macOS 13 or later.
-This build is code-signed but not notarized by Apple.
-If macOS blocks opening it, verify the source, then use Open Anyway in
-System Settings > Privacy & Security.
+DosMemo.app を Applications にドラッグしてください。
+Drag DosMemo.app to Applications.
+Faites glisser DosMemo.app dans Applications.
+Ziehe DosMemo.app in den Ordner „Programme“.

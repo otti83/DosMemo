@@ -2,37 +2,10 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>CFBundleName</key>
-	<string>DosMemo</string>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
-	<key>CFBundleLocalizations</key>
-	<array>
-		<string>en</string>
-		<string>ja</string>
-	</array>
 	<key>CFBundleDisplayName</key>
 	<string>DosMemo</string>
-	<key>CFBundleIdentifier</key>
-	<string>com.dosmemo.app</string>
-	<key>CFBundleVersion</key>
-	<string>2</string>
-	<key>CFBundleShortVersionString</key>
-	<string>1.1</string>
-	<key>CFBundleExecutable</key>
-	<string>DosMemo</string>
-	<key>CFBundleIconFile</key>
-	<string>AppIcon</string>
-	<key>CFBundleInfoDictionaryVersion</key>
-	<string>6.0</string>
-	<key>CFBundlePackageType</key>
-	<string>APPL</string>
-	<key>LSMinimumSystemVersion</key>
-	<string>13.0</string>
-	<key>NSHighResolutionCapable</key>
-	<true/>
-	<key>NSPrincipalClass</key>
-	<string>NSApplication</string>
 	<key>CFBundleDocumentTypes</key>
 	<array>
 		<dict>
@@ -47,8 +20,9 @@
 				<string>public.plain-text</string>
 				<string>public.text</string>
 				<string>public.utf8-plain-text</string>
-				<string>public.log</string>
 			</array>
+			<key>NSDocumentClass</key>
+			<string>TextFileDocument</string>
 		</dict>
 		<dict>
 			<key>CFBundleTypeName</key>
@@ -61,6 +35,8 @@
 			<array>
 				<string>net.daringfireball.markdown</string>
 			</array>
+			<key>NSDocumentClass</key>
+			<string>TextFileDocument</string>
 		</dict>
 		<dict>
 			<key>CFBundleTypeName</key>
@@ -73,6 +49,8 @@
 			<array>
 				<string>public.json</string>
 			</array>
+			<key>NSDocumentClass</key>
+			<string>TextFileDocument</string>
 		</dict>
 		<dict>
 			<key>CFBundleTypeName</key>
@@ -85,6 +63,8 @@
 			<array>
 				<string>public.yaml</string>
 			</array>
+			<key>NSDocumentClass</key>
+			<string>TextFileDocument</string>
 		</dict>
 		<dict>
 			<key>CFBundleTypeName</key>
@@ -97,6 +77,8 @@
 			<array>
 				<string>public.xml</string>
 			</array>
+			<key>NSDocumentClass</key>
+			<string>TextFileDocument</string>
 		</dict>
 		<dict>
 			<key>CFBundleTypeName</key>
@@ -111,6 +93,8 @@
 				<string>com.apple.xml-property-list</string>
 				<string>com.apple.binary-property-list</string>
 			</array>
+			<key>NSDocumentClass</key>
+			<string>TextFileDocument</string>
 		</dict>
 		<dict>
 			<key>CFBundleTypeName</key>
@@ -123,6 +107,8 @@
 			<array>
 				<string>public.html</string>
 			</array>
+			<key>NSDocumentClass</key>
+			<string>TextFileDocument</string>
 		</dict>
 		<dict>
 			<key>CFBundleTypeName</key>
@@ -135,10 +121,12 @@
 			<array>
 				<string>public.css</string>
 			</array>
+			<key>NSDocumentClass</key>
+			<string>TextFileDocument</string>
 		</dict>
 		<dict>
 			<key>CFBundleTypeName</key>
-			<string>Script</string>
+			<string>JavaScript</string>
 			<key>CFBundleTypeRole</key>
 			<string>Editor</string>
 			<key>LSHandlerRank</key>
@@ -146,14 +134,41 @@
 			<key>LSItemContentTypes</key>
 			<array>
 				<string>com.netscape.javascript-source</string>
-				<string>public.shell-script</string>
-				<string>public.python-script</string>
-				<string>public.script</string>
 			</array>
+			<key>NSDocumentClass</key>
+			<string>TextFileDocument</string>
 		</dict>
 		<dict>
 			<key>CFBundleTypeName</key>
-			<string>Delimited Text</string>
+			<string>Shell Script</string>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>LSHandlerRank</key>
+			<string>Alternate</string>
+			<key>LSItemContentTypes</key>
+			<array>
+				<string>public.shell-script</string>
+			</array>
+			<key>NSDocumentClass</key>
+			<string>TextFileDocument</string>
+		</dict>
+		<dict>
+			<key>CFBundleTypeName</key>
+			<string>Python Script</string>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>LSHandlerRank</key>
+			<string>Alternate</string>
+			<key>LSItemContentTypes</key>
+			<array>
+				<string>public.python-script</string>
+			</array>
+			<key>NSDocumentClass</key>
+			<string>TextFileDocument</string>
+		</dict>
+		<dict>
+			<key>CFBundleTypeName</key>
+			<string>CSV</string>
 			<key>CFBundleTypeRole</key>
 			<string>Editor</string>
 			<key>LSHandlerRank</key>
@@ -161,8 +176,23 @@
 			<key>LSItemContentTypes</key>
 			<array>
 				<string>public.comma-separated-values-text</string>
+			</array>
+			<key>NSDocumentClass</key>
+			<string>TextFileDocument</string>
+		</dict>
+		<dict>
+			<key>CFBundleTypeName</key>
+			<string>TSV</string>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>LSHandlerRank</key>
+			<string>Alternate</string>
+			<key>LSItemContentTypes</key>
+			<array>
 				<string>public.tab-separated-values-text</string>
 			</array>
+			<key>NSDocumentClass</key>
+			<string>TextFileDocument</string>
 		</dict>
 		<dict>
 			<key>CFBundleTypeName</key>
@@ -175,10 +205,12 @@
 			<array>
 				<string>public.toml</string>
 			</array>
+			<key>NSDocumentClass</key>
+			<string>TextFileDocument</string>
 		</dict>
 		<dict>
 			<key>CFBundleTypeName</key>
-			<string>INI / Config</string>
+			<string>INI</string>
 			<key>CFBundleTypeRole</key>
 			<string>Editor</string>
 			<key>LSHandlerRank</key>
@@ -186,8 +218,37 @@
 			<key>LSItemContentTypes</key>
 			<array>
 				<string>com.microsoft.ini</string>
+			</array>
+			<key>NSDocumentClass</key>
+			<string>TextFileDocument</string>
+		</dict>
+		<dict>
+			<key>CFBundleTypeName</key>
+			<string>Configuration File</string>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>LSHandlerRank</key>
+			<string>Alternate</string>
+			<key>LSItemContentTypes</key>
+			<array>
 				<string>com.dosmemo.conf</string>
 			</array>
+			<key>NSDocumentClass</key>
+			<string>TextFileDocument</string>
+		</dict>
+		<dict>
+			<key>CFBundleTypeName</key>
+			<string>Log</string>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>LSHandlerRank</key>
+			<string>Alternate</string>
+			<key>LSItemContentTypes</key>
+			<array>
+				<string>public.log</string>
+			</array>
+			<key>NSDocumentClass</key>
+			<string>TextFileDocument</string>
 		</dict>
 		<dict>
 			<key>CFBundleTypeName</key>
@@ -200,19 +261,64 @@
 			<array>
 				<string>public.source-code</string>
 			</array>
+			<key>NSDocumentClass</key>
+			<string>TextFileDocument</string>
+		</dict>
+		<dict>
+			<key>CFBundleTypeName</key>
+			<string>Other File</string>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>LSHandlerRank</key>
+			<string>None</string>
+			<key>LSItemContentTypes</key>
+			<array>
+				<string>public.data</string>
+			</array>
+			<key>NSDocumentClass</key>
+			<string>TextFileDocument</string>
 		</dict>
 	</array>
+	<key>CFBundleExecutable</key>
+	<string>DosMemo</string>
+	<key>CFBundleIconFile</key>
+	<string>AppIcon</string>
+	<key>CFBundleIdentifier</key>
+	<string>com.dosmemo.app</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleLocalizations</key>
+	<array>
+		<string>en</string>
+		<string>ja</string>
+		<string>fr</string>
+		<string>de</string>
+	</array>
+	<key>CFBundleName</key>
+	<string>DosMemo</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>CFBundleShortVersionString</key>
+	<string>1.1.1</string>
+	<key>CFBundleVersion</key>
+	<string>3</string>
+	<key>LSMinimumSystemVersion</key>
+	<string>13.0</string>
+	<key>NSHighResolutionCapable</key>
+	<true/>
+	<key>NSPrincipalClass</key>
+	<string>NSApplication</string>
 	<key>UTImportedTypeDeclarations</key>
 	<array>
 		<dict>
-			<key>UTTypeIdentifier</key>
-			<string>net.daringfireball.markdown</string>
-			<key>UTTypeDescription</key>
-			<string>Markdown</string>
 			<key>UTTypeConformsTo</key>
 			<array>
 				<string>public.plain-text</string>
 			</array>
+			<key>UTTypeDescription</key>
+			<string>Markdown</string>
+			<key>UTTypeIdentifier</key>
+			<string>net.daringfireball.markdown</string>
 			<key>UTTypeTagSpecification</key>
 			<dict>
 				<key>public.filename-extension</key>
@@ -230,14 +336,14 @@
 			</dict>
 		</dict>
 		<dict>
-			<key>UTTypeIdentifier</key>
-			<string>public.toml</string>
-			<key>UTTypeDescription</key>
-			<string>TOML</string>
 			<key>UTTypeConformsTo</key>
 			<array>
 				<string>public.plain-text</string>
 			</array>
+			<key>UTTypeDescription</key>
+			<string>TOML</string>
+			<key>UTTypeIdentifier</key>
+			<string>public.toml</string>
 			<key>UTTypeTagSpecification</key>
 			<dict>
 				<key>public.filename-extension</key>
@@ -251,14 +357,14 @@
 			</dict>
 		</dict>
 		<dict>
-			<key>UTTypeIdentifier</key>
-			<string>com.microsoft.ini</string>
-			<key>UTTypeDescription</key>
-			<string>INI</string>
 			<key>UTTypeConformsTo</key>
 			<array>
 				<string>public.plain-text</string>
 			</array>
+			<key>UTTypeDescription</key>
+			<string>INI</string>
+			<key>UTTypeIdentifier</key>
+			<string>com.microsoft.ini</string>
 			<key>UTTypeTagSpecification</key>
 			<dict>
 				<key>public.filename-extension</key>
@@ -268,14 +374,14 @@
 			</dict>
 		</dict>
 		<dict>
-			<key>UTTypeIdentifier</key>
-			<string>com.dosmemo.conf</string>
-			<key>UTTypeDescription</key>
-			<string>Configuration File</string>
 			<key>UTTypeConformsTo</key>
 			<array>
 				<string>public.plain-text</string>
 			</array>
+			<key>UTTypeDescription</key>
+			<string>Configuration File</string>
+			<key>UTTypeIdentifier</key>
+			<string>com.dosmemo.conf</string>
 			<key>UTTypeTagSpecification</key>
 			<dict>
 				<key>public.filename-extension</key>

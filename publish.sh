@@ -10,7 +10,7 @@ VERSION=$(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' Resourc
 TAG="v$VERSION"
 ARCH=$(uname -m)
 if [[ ! -d .git ]]; then git init -b main; fi
-git add .gitignore Package.swift Sources Tests Resources icon build.sh test.sh swiftpm-env.sh release.sh publish.sh setup-github.sh README.md INSTALL.txt release-notes
+git add .gitignore Package.swift Package.resolved Sources Tests Resources icon build.sh test.sh swiftpm-env.sh release.sh publish.sh setup-github.sh README.md README.ja.md docs INSTALL.txt release-notes
 if ! git diff --cached --quiet; then git commit -m "Prepare DosMemo $VERSION release"; fi
 if ! gh repo view "$REPO" >/dev/null 2>&1; then
     gh repo create "$REPO" --public --source=. --remote=origin
@@ -30,19 +30,16 @@ if [[ "$(git rev-parse "$TAG^{commit}")" != "$(git rev-parse HEAD)" ]]; then
     echo 'Release tag points to a different commit; update the app version.' >&2; exit 1
 fi
 git push origin "$TAG"
-SIGNER=$(hdiutil attach -nobrowse -readonly "dist/DosMemo-$VERSION-$ARCH.dmg" | awk -F'\t' 'END {print $NF}')
-AUTHORITY=$(codesign -dvv "$SIGNER/DosMemo.app" 2>&1 | sed -n 's/^Authority=//p' | head -n 1)
-hdiutil detach "$SIGNER" -quiet
-if [[ -n "$AUTHORITY" ]]; then
-    SIGNING_NOTE="「${AUTHORITY}」で署名済み(Apple の公証は未取得)。"
+if xcrun stapler validate "dist/DosMemo-$VERSION-$ARCH.dmg" >/dev/null 2>&1; then
+    SIGNING_NOTE="Developer ID signed and notarized by Apple."
 else
-    SIGNING_NOTE="アドホック署名(Apple の公証は未取得)。"
+    SIGNING_NOTE="Not notarized: macOS may block the first launch (Control-click DosMemo and choose Open)."
 fi
 NOTES_FILE=$(mktemp)
 trap 'rm -f "$NOTES_FILE"' EXIT
 {
     if [[ -f "release-notes/$TAG.md" ]]; then cat "release-notes/$TAG.md"; echo; fi
-    echo "macOS 13以降 / ${ARCH}。DMGを開いてApplicationsへドラッグしてください。${SIGNING_NOTE}初回起動がブロックされた場合は同梱の INSTALL.txt を参照してください。"
+    echo "macOS 13+ / ${ARCH}. ${SIGNING_NOTE}"
 } > "$NOTES_FILE"
 gh release create "$TAG" "dist/DosMemo-$VERSION-$ARCH.dmg" "dist/DosMemo-$VERSION-$ARCH.dmg.sha256" \
     --repo "$REPO" --verify-tag --title "DosMemo $VERSION" --notes-file "$NOTES_FILE"

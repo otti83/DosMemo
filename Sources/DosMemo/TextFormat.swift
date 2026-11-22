@@ -5,11 +5,19 @@ import UniformTypeIdentifiers
 /// Types that macOS does not declare itself are imported in `Info.plist`
 /// (`UTImportedTypeDeclarations`); keep the identifiers below in sync with it.
 enum TextFormat {
-    static let markdown = UTType(importedAs: "net.daringfireball.markdown", conformingTo: .plainText)
-    static let toml = UTType(importedAs: "public.toml", conformingTo: .plainText)
-    static let ini = UTType(importedAs: "com.microsoft.ini", conformingTo: .plainText)
+    static let markdown = declared("net.daringfireball.markdown")
+    static let toml = declared("public.toml")
+    static let ini = declared("com.microsoft.ini")
     /// `.conf` has no system type; without this it would be a dynamic type.
-    static let conf = UTType(importedAs: "com.dosmemo.conf", conformingTo: .plainText)
+    static let conf = declared("com.dosmemo.conf")
+
+    /// The type with exactly this identifier. `UTType(importedAs:)` alone
+    /// can resolve to another app's declaration sharing the extension (an
+    /// emulator declaring `public.ini` turned `com.microsoft.ini` into it),
+    /// which then matches no document type in Info.plist.
+    private static func declared(_ identifier: String) -> UTType {
+        UTType(identifier) ?? UTType(importedAs: identifier, conformingTo: .plainText)
+    }
 
     /// System-declared types that have no static member on `UTType`.
     private static let css = UTType("public.css")

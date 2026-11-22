@@ -11,6 +11,7 @@ final class AppSettings {
         static let fontSize = "fontSize"
         static let wordWrap = "wordWrap"
         static let fontName = "fontName"
+        static let editorLayout = "editorLayout"
     }
 
     var fontName: String? {
@@ -32,5 +33,11 @@ final class AppSettings {
             return defaults.bool(forKey: Keys.wordWrap)
         }
         set { defaults.set(newValue, forKey: Keys.wordWrap) }
+    }
+
+    /// Last chosen layout, applied to documents that have a preview.
+    var editorLayout: EditorLayout {
+        get { defaults.string(forKey: Keys.editorLayout).flatMap(EditorLayout.init(rawValue:)) ?? .source }
+        set { defaults.set(newValue.rawValue, forKey: Keys.editorLayout) }
     }
 }

@@ -1,10 +1,8 @@
-import SwiftUI
+import Foundation
 import UniformTypeIdentifiers
 
-struct TextDocument: FileDocument {
-    static var readableContentTypes: [UTType] { TextFormat.readable }
-    static var writableContentTypes: [UTType] { TextFormat.writable }
-
+/// The decoded contents of a text file plus how to write it back.
+struct TextContent {
     var text: String
     var encoding: String.Encoding
     var lineEnding: LineEnding
@@ -16,13 +14,6 @@ struct TextDocument: FileDocument {
         self.encoding = .utf8
         self.lineEnding = .lf
         self.isBinaryPropertyList = false
-    }
-
-    init(configuration: ReadConfiguration) throws {
-        guard let data = configuration.file.regularFileContents else {
-            throw CocoaError(.fileReadCorruptFile)
-        }
-        try self.init(data: data)
     }
 
     init(data: Data) throws {
@@ -38,10 +29,6 @@ struct TextDocument: FileDocument {
             self.lineEnding = result.lineEnding
             self.isBinaryPropertyList = false
         }
-    }
-
-    func fileWrapper(configuration: WriteConfiguration) throws -> FileWrapper {
-        FileWrapper(regularFileWithContents: try data(for: configuration.contentType))
     }
 
     func data(for contentType: UTType) throws -> Data {

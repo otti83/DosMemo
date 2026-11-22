@@ -1,0 +1,20 @@
+/* Document type and imported type names. */
+"Plain Text" = "テキスト";
+"Markdown" = "Markdown";
+"JSON" = "JSON";
+"YAML" = "YAML";
+"XML" = "XML";
+"Property List" = "Plist";
+"HTML" = "HTML";
+"CSS" = "CSS";
+"JavaScript" = "JavaScript";
+"Shell Script" = "シェル";
+"Python Script" = "Python";
+"CSV" = "CSV";
+"TSV" = "TSV";
+"TOML" = "TOML";
+"INI" = "INI";
+"Configuration File" = "設定";
+"Log" = "ログ";
+"Source Code" = "ソース";
+"Other File" = "その他";

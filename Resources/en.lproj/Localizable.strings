@@ -1,61 +1,88 @@
-/* DosMemo — English (default) */
+/* DosMemo — en. Generated from one table; keep all languages in sync. */
 
-/* Menu bar */
+"menu.app.about" = "About DosMemo";
+"menu.app.services" = "Services";
+"menu.app.hide" = "Hide DosMemo";
+"menu.app.hideOthers" = "Hide Others";
+"menu.app.showAll" = "Show All";
+"menu.app.quit" = "Quit DosMemo";
+"menu.file" = "File";
 "menu.file.new" = "New";
 "menu.file.open" = "Open…";
-"menu.file.save" = "Save";
 "menu.file.close" = "Close";
+"menu.file.save" = "Save";
 "menu.file.saveAs" = "Save As…";
-
-"menu.find" = "Find";
-"menu.find.find" = "Find…";
-"menu.find.replace" = "Replace…";
-"menu.find.next" = "Find Next";
-"menu.find.previous" = "Find Previous";
-"menu.find.useSelection" = "Use Selection for Find";
-
+"menu.file.revert" = "Revert";
+"menu.edit" = "Edit";
+"menu.edit.undo" = "Undo";
+"menu.edit.redo" = "Redo";
+"menu.edit.cut" = "Cut";
+"menu.edit.copy" = "Copy";
+"menu.edit.paste" = "Paste";
+"menu.edit.delete" = "Delete";
+"menu.edit.selectAll" = "Select All";
+"menu.view" = "View";
+"layout.source" = "Source";
+"layout.split" = "Split";
+"layout.preview" = "Preview";
 "menu.view.zoomIn" = "Zoom In";
 "menu.view.zoomOut" = "Zoom Out";
 "menu.view.zoomReset" = "Actual Size";
 "menu.view.font" = "Font…";
-"menu.view.wrap" = "Word Wrap";
-
-"about" = "About DosMemo";
-
-/* Toolbar */
+"menu.view.wrap" = "Wrap";
+"menu.view.toolbar" = "Show Toolbar";
+"menu.view.customizeToolbar" = "Customize…";
+"menu.find" = "Find";
+"menu.find.find" = "Find…";
+"menu.find.replace" = "Replace…";
+"menu.find.next" = "Next";
+"menu.find.previous" = "Previous";
+"menu.find.useSelection" = "Use Selection";
+"menu.window" = "Window";
+"menu.window.minimize" = "Minimize";
+"menu.window.zoom" = "Zoom";
+"menu.window.bringAllToFront" = "All to Front";
+"menu.help" = "Help";
+"toolbar.layout" = "View";
 "toolbar.file" = "File";
-"toolbar.file.help" = "File operations";
 "toolbar.font" = "Font";
-"toolbar.font.help" = "Font / Size";
-"toolbar.font.section" = "Font";
-"toolbar.font.system" = "System Default (Monospaced)";
-"toolbar.font.other" = "Other Font…";
-"toolbar.size.section" = "Size";
 "toolbar.find" = "Find";
-"toolbar.find.help" = "Find / Replace (⌘F)";
 "toolbar.encoding" = "Encoding";
-"toolbar.encoding.help" = "Text Encoding / Line Endings";
-"toolbar.encoding.section" = "Text Encoding (on save)";
-"toolbar.lineEnding.section" = "Line Endings";
 "toolbar.zoomOut" = "Zoom Out";
-"toolbar.zoomOut.help" = "Zoom Out (⌘-)";
 "toolbar.zoomIn" = "Zoom In";
-"toolbar.zoomIn.help" = "Zoom In (⌘+)";
 "toolbar.wrap" = "Wrap";
-"toolbar.wrap.help" = "Word Wrap (⌘⌥L)";
-
-/* Line endings */
-"lineEnding.lf" = "LF (Unix / macOS)";
+"toolbar.font.section" = "Font";
+"toolbar.font.system" = "Monospaced";
+"toolbar.font.other" = "Other…";
+"toolbar.size.section" = "Size";
+"toolbar.encoding.section" = "Encoding";
+"toolbar.lineEnding.section" = "Line Endings";
+"lineEnding.lf" = "LF (macOS / Unix)";
 "lineEnding.crlf" = "CRLF (Windows)";
 "lineEnding.cr" = "CR (Classic Mac)";
-
-/* Status bar */
 "status.position" = "Ln %1$@, Col %2$@";
-"status.selection" = "(Selection: %@ chars)";
+"status.selection" = "(%@ selected)";
 "status.counts" = "%1$@ chars / %2$@ lines";
 "status.binaryPlist" = "Binary plist";
-
-/* Errors */
-"error.encoding.lossy" = "Some characters can't be saved as %@.";
-"error.encoding.lossy.reason" = "Choose UTF-8 (or another Unicode encoding) from the Encoding menu, then save again.";
-"error.plist.invalid" = "The property list contains a syntax error, so it can't be saved in binary format.";
+"close.message" = "Save changes to “%@”?";
+"close.save" = "Save";
+"close.dontSave" = "Don’t Save";
+"close.cancel" = "Cancel";
+"error.encoding.lossy" = "Can’t save some characters as %@.";
+"error.encoding.lossy.reason" = "Choose UTF-8.";
+"error.plist.invalid" = "Syntax error in the property list.";
+"tree.root" = "Root";
+"tree.column.key" = "Key";
+"tree.column.type" = "Type";
+"tree.column.value" = "Value";
+"tree.count.items" = "%ld items";
+"tree.type.dictionary" = "Dictionary";
+"tree.type.array" = "Array";
+"tree.type.string" = "String";
+"tree.type.number" = "Number";
+"tree.type.boolean" = "Boolean";
+"tree.type.date" = "Date";
+"tree.type.data" = "Data";
+"tree.type.null" = "Null";
+"tree.error.title" = "Syntax error";
+"save.format" = "Format:";

@@ -1,61 +1,88 @@
-/* DosMemo — 日本語 */
+/* DosMemo — ja. Generated from one table; keep all languages in sync. */
 
-/* メニューバー */
-"menu.file.new" = "新規作成";
+"menu.app.about" = "DosMemo について";
+"menu.app.services" = "サービス";
+"menu.app.hide" = "DosMemo を隠す";
+"menu.app.hideOthers" = "ほかを隠す";
+"menu.app.showAll" = "すべてを表示";
+"menu.app.quit" = "DosMemo を終了";
+"menu.file" = "ファイル";
+"menu.file.new" = "新規";
 "menu.file.open" = "開く…";
-"menu.file.save" = "上書き保存";
 "menu.file.close" = "閉じる";
-"menu.file.saveAs" = "名前を付けて保存…";
-
+"menu.file.save" = "保存";
+"menu.file.saveAs" = "別名で保存…";
+"menu.file.revert" = "復帰";
+"menu.edit" = "編集";
+"menu.edit.undo" = "取り消す";
+"menu.edit.redo" = "やり直す";
+"menu.edit.cut" = "カット";
+"menu.edit.copy" = "コピー";
+"menu.edit.paste" = "ペースト";
+"menu.edit.delete" = "削除";
+"menu.edit.selectAll" = "すべてを選択";
+"menu.view" = "表示";
+"layout.source" = "ソース";
+"layout.split" = "分割";
+"layout.preview" = "プレビュー";
+"menu.view.zoomIn" = "拡大";
+"menu.view.zoomOut" = "縮小";
+"menu.view.zoomReset" = "等倍";
+"menu.view.font" = "フォント…";
+"menu.view.wrap" = "折り返し";
+"menu.view.toolbar" = "ツールバーを表示";
+"menu.view.customizeToolbar" = "カスタマイズ…";
 "menu.find" = "検索";
 "menu.find.find" = "検索…";
 "menu.find.replace" = "置換…";
-"menu.find.next" = "次を検索";
-"menu.find.previous" = "前を検索";
-"menu.find.useSelection" = "選択を検索文字列にする";
-
-"menu.view.zoomIn" = "拡大";
-"menu.view.zoomOut" = "縮小";
-"menu.view.zoomReset" = "100%に戻す";
-"menu.view.font" = "フォント…";
-"menu.view.wrap" = "折り返し";
-
-"about" = "DosMemo について";
-
-/* ツールバー */
+"menu.find.next" = "次へ";
+"menu.find.previous" = "前へ";
+"menu.find.useSelection" = "選択を検索";
+"menu.window" = "ウインドウ";
+"menu.window.minimize" = "しまう";
+"menu.window.zoom" = "ズーム";
+"menu.window.bringAllToFront" = "すべて前面へ";
+"menu.help" = "ヘルプ";
+"toolbar.layout" = "表示";
 "toolbar.file" = "ファイル";
-"toolbar.file.help" = "ファイル操作";
 "toolbar.font" = "フォント";
-"toolbar.font.help" = "フォント / サイズ";
-"toolbar.font.section" = "フォント";
-"toolbar.font.system" = "システム標準(等幅)";
-"toolbar.font.other" = "その他のフォント…";
-"toolbar.size.section" = "サイズ";
 "toolbar.find" = "検索";
-"toolbar.find.help" = "検索 / 置換 (⌘F)";
 "toolbar.encoding" = "エンコード";
-"toolbar.encoding.help" = "文字コード / 改行コード";
-"toolbar.encoding.section" = "文字コード（保存時）";
-"toolbar.lineEnding.section" = "改行コード";
 "toolbar.zoomOut" = "縮小";
-"toolbar.zoomOut.help" = "縮小(⌘-)";
 "toolbar.zoomIn" = "拡大";
-"toolbar.zoomIn.help" = "拡大(⌘+)";
 "toolbar.wrap" = "折り返し";
-"toolbar.wrap.help" = "折り返し(⌘⌥L)";
-
-/* 改行コード */
-"lineEnding.lf" = "LF (Unix / macOS)";
+"toolbar.font.section" = "フォント";
+"toolbar.font.system" = "等幅";
+"toolbar.font.other" = "その他…";
+"toolbar.size.section" = "サイズ";
+"toolbar.encoding.section" = "文字コード";
+"toolbar.lineEnding.section" = "改行コード";
+"lineEnding.lf" = "LF (macOS / Unix)";
 "lineEnding.crlf" = "CRLF (Windows)";
 "lineEnding.cr" = "CR (Classic Mac)";
-
-/* ステータスバー */
 "status.position" = "行 %1$@、列 %2$@";
 "status.selection" = "(選択: %@ 文字)";
 "status.counts" = "%1$@ 文字 / %2$@ 行";
 "status.binaryPlist" = "バイナリ plist";
-
-/* エラー */
-"error.encoding.lossy" = "%@ では保存できない文字が含まれています。";
-"error.encoding.lossy.reason" = "エンコードメニューで UTF-8 などの Unicode を選んでから保存し直してください。";
-"error.plist.invalid" = "プロパティリストに構文エラーがあるため、バイナリ形式で保存できません。";
+"close.message" = "“%@” の変更を保存しますか？";
+"close.save" = "保存";
+"close.dontSave" = "保存しない";
+"close.cancel" = "キャンセル";
+"error.encoding.lossy" = "%@ で保存できない文字があります。";
+"error.encoding.lossy.reason" = "UTF-8 を選んでください。";
+"error.plist.invalid" = "プロパティリストに構文エラーがあります。";
+"tree.root" = "ルート";
+"tree.column.key" = "キー";
+"tree.column.type" = "型";
+"tree.column.value" = "値";
+"tree.count.items" = "%ld 項目";
+"tree.type.dictionary" = "辞書";
+"tree.type.array" = "配列";
+"tree.type.string" = "文字列";
+"tree.type.number" = "数値";
+"tree.type.boolean" = "ブール値";
+"tree.type.date" = "日付";
+"tree.type.data" = "データ";
+"tree.type.null" = "null";
+"tree.error.title" = "構文エラー";
+"save.format" = "形式:";

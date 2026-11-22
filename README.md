@@ -1,36 +1,47 @@
 # DosMemo
 
-macOS 13以降向けの軽量テキストエディタ。日本語・英語UI、検索・置換、フォント・折り返し設定、文字コードと改行コードの保持に対応します。
+[日本語](README.ja.md)
 
-- 対応形式: テキスト / Markdown / JSON / YAML / XML / plist（バイナリ plist は XML として編集し、バイナリで保存）/ HTML / CSS / JavaScript / シェル / Python / CSV / TSV / TOML / INI / conf / ログ / ソースコード
-- Dock アイコンの右クリックメニューから「新規作成」「開く…」
+A lightweight text editor for macOS 13 or later, in the spirit of Windows Notepad.
 
-## インストール
+![Markdown in split view](docs/screenshots/en-markdown.png)
 
-GitHub ReleasesのDMGを開き、DosMemo.appをApplicationsへドラッグしてください。
-配布ビルドは開発者証明書で署名されていますが、Appleによる公証はありません。初回起動がブロックされた場合の手順は同梱のINSTALL.txtを参照してください。
+## Features
 
-## ビルド
+- **Markdown preview** — GitHub Flavored Markdown: tables, task lists, strikethrough, code blocks. Follows light and dark mode.
+- **JSON / plist tree** — keys, types and values in a collapsible tree. Syntax errors show the line and column.
 
-XcodeまたはSwift 5.9以降のツールチェーンが必要です。
+  ![JSON tree](docs/screenshots/en-json.png)
+
+- **Source / Split / Preview** — toolbar or View menu (⌥⌘1–3).
+- **Encodings and line endings kept** — UTF-8, UTF-16, Shift_JIS, EUC-JP; LF, CRLF, CR.
+
+  ![Shift_JIS text with CRLF](docs/screenshots/en-text.png)
+
+- **Text formats** — txt, md, json, yaml, xml, plist (binary plists are edited as XML and saved as binary), html, css, js, sh, py, csv, tsv, toml, ini, conf, log, source code.
+- **Dock menu** — New and Open from the Dock icon.
+- **Languages** — English, Japanese, French, German.
+
+## Install
+
+Download the DMG from [Releases](https://github.com/otti83/DosMemo/releases) and drag DosMemo to Applications.
+
+## Build
+
+Requires Xcode or a Swift 5.9+ toolchain.
 
 ```sh
-bash test.sh            # ユニットテスト
-bash build.sh release   # DosMemo.app を作成
-bash release.sh         # dist/ に DMG と SHA-256 を作成
+bash test.sh            # unit tests
+bash build.sh release   # ~/Library/Caches/com.dosmemo.build/app/DosMemo.app
+bash release.sh         # signed, notarized DMG in dist/
 ```
 
-- ビルド成果物はローカルの `~/Library/Caches/com.dosmemo.build`（`DOSMEMO_BUILD_DIR` で変更可）に置きます。ネットワークドライブ上ではSwiftPMのビルドとコード署名が失敗するためです。
-- 署名は `Developer ID Application` → `Apple Development` → アドホックの順に自動選択します。`DOSMEMO_SIGN_IDENTITY` で明示指定できます（`-` でアドホック）。Gatekeeper を通すには Developer ID 証明書での署名と公証が必要です。
-- 翻訳は `Resources/*.lproj` にあり、`build.sh` がアプリの `Contents/Resources` にコピーします。SwiftPM のリソースバンドル（`Bundle.module`）は使いません。ビルドマシンの絶対パスを参照し、他のMacで起動時にクラッシュするためです。
+- Build products go to `~/Library/Caches/com.dosmemo.build` (override with `DOSMEMO_BUILD_DIR`); SwiftPM builds and code signing fail on network volumes.
+- Signing picks `Developer ID Application`, then `Apple Development`, then ad-hoc. Override with `DOSMEMO_SIGN_IDENTITY` (`-` for ad-hoc).
+- `release.sh` notarizes when the identity is Developer ID and the `dosmemo-notary` keychain profile exists (`xcrun notarytool store-credentials dosmemo-notary`). Override the profile with `DOSMEMO_NOTARY_PROFILE`.
+- Localizations are in `Resources/*.lproj`; `build.sh` copies them into `Contents/Resources`.
 
-## GitHubへの公開
+## Acknowledgements
 
-通常のターミナルで次を実行してください。セットアップはGitHub公式のCLIをプロジェクト内の`.tools/bin`に導入し、ブラウザ経由で認証します。
-
-```sh
-bash setup-github.sh
-bash publish.sh otti83/DosMemo
-```
-
-リポジトリが存在しない場合は公開リポジトリとして作成し、ソースとバージョンタグをpushして、DMGをGitHub Releaseに添付します。
+- [swift-cmark](https://github.com/swiftlang/swift-cmark) (cmark-gfm) for Markdown
+- [github-markdown-css](https://github.com/sindresorhus/github-markdown-css) (MIT, `Resources/markdown/`)

@@ -39,6 +39,11 @@ final class EditorTextView: NSTextView {
         }
     }
 
+    override func viewDidMoveToWindow() {
+        super.viewDidMoveToWindow()
+        if isEditable, let window { window.makeFirstResponder(self) }
+    }
+
     override var readablePasteboardTypes: [NSPasteboard.PasteboardType] {
         return [.string]
     }

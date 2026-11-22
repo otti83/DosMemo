@@ -2,7 +2,9 @@
 # Builds DosMemo.app.
 #
 # Usage: bash build.sh [release|debug] [output-dir]
-#   output-dir defaults to the project root.
+#   output-dir defaults to $DOSMEMO_BUILD_DIR/app (a local volume: apps on
+#   network shares pick up Finder info that breaks their code signature, and
+#   macOS then kills them at launch).
 #
 # Signing: set DOSMEMO_SIGN_IDENTITY to choose a codesigning identity ("-" for
 # ad-hoc). Otherwise the first "Developer ID Application" identity is used,
@@ -13,9 +15,9 @@ ROOT="$(cd "$(dirname "$0")" && pwd)"
 cd "$ROOT"
 
 CONFIG="${1:-release}"
-OUT_DIR="${2:-$ROOT}"
 echo "Building DosMemo ($CONFIG)..."
 source "$ROOT/swiftpm-env.sh"
+OUT_DIR="${2:-$DOSMEMO_BUILD_DIR/app}"
 swift build "${SWIFTPM_ARGS[@]}" -c "$CONFIG" --product DosMemo
 BIN_DIR="$(swift build "${SWIFTPM_ARGS[@]}" -c "$CONFIG" --show-bin-path)"
 EXEC="$BIN_DIR/DosMemo"
@@ -41,6 +43,7 @@ ditto --norsrc --noextattr "$ROOT/Resources/Info.plist" "$APP/Contents/Info.plis
 for lproj in "$ROOT"/Resources/*.lproj; do
     ditto --norsrc --noextattr "$lproj" "$APP/Contents/Resources/$(basename "$lproj")"
 done
+ditto --norsrc --noextattr "$ROOT/Resources/markdown" "$APP/Contents/Resources/markdown"
 ditto --norsrc --noextattr "$ROOT/icon/AppIcon.icns" "$APP/Contents/Resources/AppIcon.icns"
 xattr -cr "$APP"
 
@@ -56,4 +59,6 @@ codesign --verify --strict --verbose=2 "$APP"
 mkdir -p "$OUT_DIR"
 rm -rf "$OUT_DIR/DosMemo.app"
 ditto --norsrc --noextattr "$APP" "$OUT_DIR/DosMemo.app"
+codesign --verify --strict "$OUT_DIR/DosMemo.app" \
+    || { echo "error: the signature broke when copying to $OUT_DIR (network volume?)" >&2; exit 1; }
 echo "Built: $OUT_DIR/DosMemo.app"
