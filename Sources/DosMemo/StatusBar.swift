@@ -9,6 +9,14 @@ struct StatusBar: View {
     let zoom: Int
     let lineEnding: LineEnding
     let encoding: String.Encoding
+    let isBinaryPropertyList: Bool
+
+    private static let numberFormatter: NumberFormatter = {
+        let f = NumberFormatter()
+        f.numberStyle = .decimal
+        f.groupingSeparator = ","
+        return f
+    }()
 
     var body: some View {
         HStack(spacing: 12) {
@@ -18,12 +26,16 @@ struct StatusBar: View {
             }
             Spacer(minLength: 12)
             Text(L("status.counts", formatted(chars), formatted(lines)))
-            Divider().frame(height: 14)
+            separator
             Text("\(zoom)%")
-            Divider().frame(height: 14)
-            Text(lineEndingLabel)
-            Divider().frame(height: 14)
-            Text(encodingLabel)
+            separator
+            if isBinaryPropertyList {
+                Text(L("status.binaryPlist"))
+            } else {
+                Text(lineEnding.label)
+                separator
+                Text(TextEncodingInfo.label(for: encoding))
+            }
         }
         .font(.system(size: 11))
         .foregroundColor(.secondary)
@@ -39,32 +51,11 @@ struct StatusBar: View {
         )
     }
 
+    private var separator: some View {
+        Divider().frame(height: 14)
+    }
+
     private func formatted(_ n: Int) -> String {
-        let f = NumberFormatter()
-        f.numberStyle = .decimal
-        f.groupingSeparator = ","
-        return f.string(from: NSNumber(value: n)) ?? "\(n)"
-    }
-
-    private var lineEndingLabel: String {
-        switch lineEnding {
-        case .lf:   return "LF"
-        case .crlf: return "CRLF"
-        case .cr:   return "CR"
-        }
-    }
-
-    private var encodingLabel: String {
-        switch encoding {
-        case .utf8:              return "UTF-8"
-        case .utf16LittleEndian: return "UTF-16 LE"
-        case .utf16BigEndian:    return "UTF-16 BE"
-        case .utf16:             return "UTF-16"
-        case .shiftJIS:          return "Shift_JIS"
-        case .japaneseEUC:       return "EUC-JP"
-        case .isoLatin1:         return "ISO Latin-1"
-        case .ascii:             return "ASCII"
-        default:                 return "Unknown"
-        }
+        Self.numberFormatter.string(from: NSNumber(value: n)) ?? "\(n)"
     }
 }

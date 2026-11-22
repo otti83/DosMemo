@@ -2,6 +2,9 @@ import Foundation
 
 final class AppSettings {
     static let shared = AppSettings()
+    static let baseFontSize: CGFloat = 14
+    static let fontSizeRange: ClosedRange<CGFloat> = 8...72
+
     private let defaults = UserDefaults.standard
 
     private enum Keys {
@@ -17,8 +20,8 @@ final class AppSettings {
 
     var defaultFontSize: CGFloat {
         get {
-            let v = defaults.double(forKey: Keys.fontSize)
-            return v >= 8 ? CGFloat(v) : 14
+            let v = CGFloat(defaults.double(forKey: Keys.fontSize))
+            return Self.fontSizeRange.contains(v) ? v : Self.baseFontSize
         }
         set { defaults.set(Double(newValue), forKey: Keys.fontSize) }
     }

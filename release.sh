@@ -1,20 +1,35 @@
 #!/bin/bash
+# Builds a signed release DMG into dist/. Signing follows build.sh.
 set -euo pipefail
 ROOT="$(cd "$(dirname "$0")" && pwd)"
 cd "$ROOT"
-bash "$ROOT/build.sh" release
 VERSION=$(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' Resources/Info.plist)
 ARCH=$(uname -m)
-mkdir -p "$ROOT/dist"
-STAGING=$(mktemp -d "$ROOT/dist/staging.XXXXXX")
+
+# Stage on a local volume (see build.sh) and build the DMG from there.
+STAGING=$(mktemp -d "${TMPDIR:-/tmp}/dosmemo-release.XXXXXX")
 trap 'rm -rf "$STAGING"' EXIT
 mkdir "$STAGING/content"
-ditto "$ROOT/DosMemo.app" "$STAGING/content/DosMemo.app"
+bash "$ROOT/build.sh" release "$STAGING/content"
+APP="$STAGING/content/DosMemo.app"
 ln -s /Applications "$STAGING/content/Applications"
-cp "$ROOT/INSTALL.txt" "$STAGING/content/INSTALL.txt"
-DMG="$ROOT/dist/DosMemo-$VERSION-$ARCH.dmg"
-hdiutil makehybrid -hfs -hfs-volume-name "DosMemo $VERSION" -o "$STAGING/source.dmg" "$STAGING/content" -ov
-hdiutil convert "$STAGING/source.dmg" -format UDZO -o "$DMG" -ov
-hdiutil verify "$DMG"
-(cd "$ROOT/dist" && shasum -a 256 "$(basename "$DMG")" > "$(basename "$DMG").sha256")
-echo "Release: $DMG"
+ditto --norsrc --noextattr "$ROOT/INSTALL.txt" "$STAGING/content/INSTALL.txt"
+
+DMG_NAME="DosMemo-$VERSION-$ARCH.dmg"
+# Not `hdiutil makehybrid`: its HFS output attaches FinderInfo to files,
+# which invalidates the app's code signature under strict verification.
+hdiutil create -volname "DosMemo $VERSION" -srcfolder "$STAGING/content" -fs HFS+ -format UDZO -ov "$STAGING/$DMG_NAME"
+IDENTITY=$(codesign -dvv "$APP" 2>&1 | sed -n 's/^Authority=//p' | head -n 1)
+if [[ -n "$IDENTITY" ]]; then
+    codesign --sign "$IDENTITY" --timestamp "$STAGING/$DMG_NAME"
+    codesign --verify --verbose=2 "$STAGING/$DMG_NAME"
+fi
+hdiutil verify "$STAGING/$DMG_NAME"
+MOUNT=$(hdiutil attach -nobrowse -readonly "$STAGING/$DMG_NAME" | awk -F'\t' 'END {print $NF}')
+codesign --verify --strict --verbose=2 "$MOUNT/DosMemo.app" || { hdiutil detach "$MOUNT" -quiet; exit 1; }
+hdiutil detach "$MOUNT" -quiet
+
+mkdir -p "$ROOT/dist"
+ditto --norsrc --noextattr "$STAGING/$DMG_NAME" "$ROOT/dist/$DMG_NAME"
+(cd "$ROOT/dist" && shasum -a 256 "$DMG_NAME" > "$DMG_NAME.sha256")
+echo "Release: $ROOT/dist/$DMG_NAME (signed by: ${IDENTITY:-ad-hoc})"

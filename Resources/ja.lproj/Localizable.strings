@@ -1,13 +1,10 @@
 /* DosMemo — 日本語 */
 
 /* メニューバー */
-"menu.file" = "ファイル";
 "menu.file.new" = "新規作成";
 "menu.file.open" = "開く…";
-"menu.file.openRecent" = "最近使った項目を開く";
-"menu.file.clearRecent" = "メニューをクリア";
-"menu.file.close" = "閉じる";
 "menu.file.save" = "上書き保存";
+"menu.file.close" = "閉じる";
 "menu.file.saveAs" = "名前を付けて保存…";
 
 "menu.find" = "検索";
@@ -17,7 +14,6 @@
 "menu.find.previous" = "前を検索";
 "menu.find.useSelection" = "選択を検索文字列にする";
 
-"menu.view" = "表示";
 "menu.view.zoomIn" = "拡大";
 "menu.view.zoomOut" = "縮小";
 "menu.view.zoomReset" = "100%に戻す";
@@ -57,3 +53,9 @@
 "status.position" = "行 %1$@、列 %2$@";
 "status.selection" = "(選択: %@ 文字)";
 "status.counts" = "%1$@ 文字 / %2$@ 行";
+"status.binaryPlist" = "バイナリ plist";
+
+/* エラー */
+"error.encoding.lossy" = "%@ では保存できない文字が含まれています。";
+"error.encoding.lossy.reason" = "エンコードメニューで UTF-8 などの Unicode を選んでから保存し直してください。";
+"error.plist.invalid" = "プロパティリストに構文エラーがあるため、バイナリ形式で保存できません。";

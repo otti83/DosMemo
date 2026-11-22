@@ -1,6 +1,6 @@
 import Foundation
 
-enum LineEnding {
+enum LineEnding: CaseIterable {
     case lf, crlf, cr
 
     var raw: String {
@@ -8,6 +8,14 @@ enum LineEnding {
         case .lf:   return "\n"
         case .crlf: return "\r\n"
         case .cr:   return "\r"
+        }
+    }
+
+    var label: String {
+        switch self {
+        case .lf:   return "LF"
+        case .crlf: return "CRLF"
+        case .cr:   return "CR"
         }
     }
 }
@@ -34,10 +42,10 @@ enum TextDecoder {
             if let s = String(data: data.dropFirst(3), encoding: .utf8) { return (s, .utf8) }
         }
         if data.starts(with: [0xFF, 0xFE]) {
-            if let s = String(data: data, encoding: .utf16LittleEndian) { return (s, .utf16LittleEndian) }
+            if let s = String(data: data.dropFirst(2), encoding: .utf16LittleEndian) { return (s, .utf16LittleEndian) }
         }
         if data.starts(with: [0xFE, 0xFF]) {
-            if let s = String(data: data, encoding: .utf16BigEndian) { return (s, .utf16BigEndian) }
+            if let s = String(data: data.dropFirst(2), encoding: .utf16BigEndian) { return (s, .utf16BigEndian) }
         }
 
         // Try UTF-8 strict
@@ -51,7 +59,7 @@ enum TextDecoder {
         return (String(data: data, encoding: .isoLatin1) ?? "", .isoLatin1)
     }
 
-    private static func detectLineEnding(_ text: String) -> LineEnding {
+    static func detectLineEnding(_ text: String) -> LineEnding {
         // Iterate unicode scalars so CRLF is seen as two distinct scalars,
         // not a single grapheme cluster.
         var prev: Unicode.Scalar? = nil
@@ -74,26 +82,83 @@ enum TextDecoder {
 }
 
 enum TextEncoder {
-    static func encode(_ text: String, encoding: String.Encoding, lineEnding: LineEnding) -> Data {
-        let translated: String
-        switch lineEnding {
-        case .lf:   translated = text
-        case .crlf: translated = text.replacingOccurrences(of: "\n", with: "\r\n")
-        case .cr:   translated = text.replacingOccurrences(of: "\n", with: "\r")
+    /// Encodes `text` for saving. Throws instead of silently replacing
+    /// characters the target encoding cannot represent (e.g. emoji in
+    /// Shift_JIS), so a save never loses data without the user knowing.
+    static func encode(_ text: String, encoding: String.Encoding, lineEnding: LineEnding) throws -> Data {
+        let translated = lineEnding == .lf
+            ? text
+            : text.replacingOccurrences(of: "\n", with: lineEnding.raw)
+        guard let data = translated.data(using: encoding, allowLossyConversion: false) else {
+            throw DosMemoError.unrepresentableCharacters(encodingName: TextEncodingInfo.label(for: encoding))
         }
-        if let data = translated.data(using: encoding, allowLossyConversion: false) {
-            if encoding == .utf16LittleEndian {
-                return Data([0xFF, 0xFE]) + data
-            }
-            if encoding == .utf16BigEndian {
-                return Data([0xFE, 0xFF]) + data
-            }
-            return data
+        switch encoding {
+        case .utf16LittleEndian: return Data([0xFF, 0xFE]) + data
+        case .utf16BigEndian:    return Data([0xFE, 0xFF]) + data
+        default:                 return data   // `.utf16` already writes its own BOM
         }
-        // Fallback: lossy in target encoding, else UTF-8
-        if let data = translated.data(using: encoding, allowLossyConversion: true) {
-            return data
+    }
+}
+
+enum TextEncodingInfo {
+    /// Encodings selectable for saving, in menu order.
+    static let choices: [String.Encoding] = [.utf8, .utf16LittleEndian, .utf16BigEndian, .shiftJIS, .japaneseEUC]
+
+    static func label(for encoding: String.Encoding) -> String {
+        switch encoding {
+        case .utf8:              return "UTF-8"
+        case .utf16LittleEndian: return "UTF-16 LE"
+        case .utf16BigEndian:    return "UTF-16 BE"
+        case .utf16:             return "UTF-16"
+        case .shiftJIS:          return "Shift_JIS"
+        case .japaneseEUC:       return "EUC-JP"
+        case .isoLatin1:         return "ISO Latin-1"
+        case .ascii:             return "ASCII"
+        default:                 return "Unknown"
         }
-        return Data(translated.utf8)
+    }
+}
+
+/// Binary property lists are not text; DosMemo edits them as XML and writes
+/// them back in binary form so files such as `Info.plist` caches or
+/// preference files keep their original format.
+enum BinaryPropertyList {
+    static func isBinary(_ data: Data) -> Bool {
+        data.starts(with: Array("bplist".utf8))
+    }
+
+    static func xmlText(from data: Data) throws -> String {
+        let object = try PropertyListSerialization.propertyList(from: data, options: [], format: nil)
+        let xml = try PropertyListSerialization.data(fromPropertyList: object, format: .xml, options: 0)
+        return String(decoding: xml, as: UTF8.self)
+    }
+
+    static func binaryData(fromXMLText text: String) throws -> Data {
+        let object: Any
+        do {
+            object = try PropertyListSerialization.propertyList(from: Data(text.utf8), options: [], format: nil)
+        } catch {
+            throw DosMemoError.invalidPropertyList(underlying: error)
+        }
+        return try PropertyListSerialization.data(fromPropertyList: object, format: .binary, options: 0)
+    }
+}
+
+enum DosMemoError: LocalizedError {
+    case unrepresentableCharacters(encodingName: String)
+    case invalidPropertyList(underlying: Error)
+
+    var errorDescription: String? {
+        switch self {
+        case .unrepresentableCharacters(let name): return L("error.encoding.lossy", name)
+        case .invalidPropertyList:                 return L("error.plist.invalid")
+        }
+    }
+
+    var failureReason: String? {
+        switch self {
+        case .unrepresentableCharacters:           return L("error.encoding.lossy.reason")
+        case .invalidPropertyList(let underlying): return (underlying as NSError).localizedDescription
+        }
     }
 }

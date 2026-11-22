@@ -1,13 +1,10 @@
 /* DosMemo — English (default) */
 
 /* Menu bar */
-"menu.file" = "File";
 "menu.file.new" = "New";
 "menu.file.open" = "Open…";
-"menu.file.openRecent" = "Open Recent";
-"menu.file.clearRecent" = "Clear Menu";
-"menu.file.close" = "Close";
 "menu.file.save" = "Save";
+"menu.file.close" = "Close";
 "menu.file.saveAs" = "Save As…";
 
 "menu.find" = "Find";
@@ -17,7 +14,6 @@
 "menu.find.previous" = "Find Previous";
 "menu.find.useSelection" = "Use Selection for Find";
 
-"menu.view" = "View";
 "menu.view.zoomIn" = "Zoom In";
 "menu.view.zoomOut" = "Zoom Out";
 "menu.view.zoomReset" = "Actual Size";
@@ -57,3 +53,9 @@
 "status.position" = "Ln %1$@, Col %2$@";
 "status.selection" = "(Selection: %@ chars)";
 "status.counts" = "%1$@ chars / %2$@ lines";
+"status.binaryPlist" = "Binary plist";
+
+/* Errors */
+"error.encoding.lossy" = "Some characters can't be saved as %@.";
+"error.encoding.lossy.reason" = "Choose UTF-8 (or another Unicode encoding) from the Encoding menu, then save again.";
+"error.plist.invalid" = "The property list contains a syntax error, so it can't be saved in binary format.";

@@ -6,11 +6,7 @@ struct TextEditorView: NSViewRepresentable {
     @Binding var fontSize: CGFloat
     @Binding var fontName: String?
     @Binding var wordWrap: Bool
-    @Binding var cursorLine: Int
-    @Binding var cursorCol: Int
-    @Binding var charCount: Int
-    @Binding var lineCount: Int
-    @Binding var selectionCount: Int
+    @Binding var metrics: EditorMetrics
 
     func makeCoordinator() -> Coordinator {
         Coordinator(self)
@@ -67,6 +63,8 @@ struct TextEditorView: NSViewRepresentable {
         textView.font = Self.preferredFont(name: fontName, size: fontSize)
         textView.textColor = .textColor
         textView.string = text
+        // Open with the caret at the top, like Notepad.
+        textView.setSelectedRange(NSRange(location: 0, length: 0))
         textView.delegate = context.coordinator
 
         textView.onZoom = { [weak coord = context.coordinator] delta in
@@ -77,9 +75,9 @@ struct TextEditorView: NSViewRepresentable {
 
         context.coordinator.textView = textView
         context.coordinator.scrollView = scrollView
-        context.coordinator.installNotificationObservers()
+        context.coordinator.installCommandObserver()
         DispatchQueue.main.async {
-            context.coordinator.recomputeAll()
+            context.coordinator.recomputeMetrics()
         }
 
         return scrollView
@@ -103,7 +101,7 @@ struct TextEditorView: NSViewRepresentable {
             )
             textView.setSelectedRange(newRange)
             textView.sizeToFit()
-            context.coordinator.recomputeAll()
+            context.coordinator.recomputeMetrics()
         }
 
         // Font is safe to update during composition.
@@ -127,7 +125,7 @@ struct TextEditorView: NSViewRepresentable {
         weak var textView: EditorTextView?
         weak var scrollView: NSScrollView?
 
-        private var observers: [NSObjectProtocol] = []
+        private var commandObserver: NSObjectProtocol?
 
         init(_ parent: TextEditorView) {
             self.parent = parent
@@ -135,44 +133,40 @@ struct TextEditorView: NSViewRepresentable {
         }
 
         deinit {
-            for o in observers { NotificationCenter.default.removeObserver(o) }
-            NSFontManager.shared.target = nil
+            if let commandObserver { NotificationCenter.default.removeObserver(commandObserver) }
+            if NSFontManager.shared.target === self { NSFontManager.shared.target = nil }
         }
 
-        // MARK: - Notification hooks (menu actions)
+        // MARK: - Menu / toolbar commands
 
-        func installNotificationObservers() {
-            let nc = NotificationCenter.default
-            observers.append(nc.addObserver(forName: .dmZoomIn,    object: nil, queue: .main) { [weak self] _ in self?.menuZoomIn() })
-            observers.append(nc.addObserver(forName: .dmZoomOut,   object: nil, queue: .main) { [weak self] _ in self?.menuZoomOut() })
-            observers.append(nc.addObserver(forName: .dmZoomReset, object: nil, queue: .main) { [weak self] _ in self?.menuZoomReset() })
-            observers.append(nc.addObserver(forName: .dmShowFont,  object: nil, queue: .main) { [weak self] _ in self?.menuShowFontPanel() })
-            observers.append(nc.addObserver(forName: .dmToggleWrap, object: nil, queue: .main) { [weak self] _ in self?.menuToggleWordWrap() })
-            observers.append(nc.addObserver(forName: .dmFind,             object: nil, queue: .main) { [weak self] _ in self?.performFinder(.showFindInterface) })
-            observers.append(nc.addObserver(forName: .dmReplace,          object: nil, queue: .main) { [weak self] _ in self?.performFinder(.showReplaceInterface) })
-            observers.append(nc.addObserver(forName: .dmFindNext,         object: nil, queue: .main) { [weak self] _ in self?.performFinder(.nextMatch) })
-            observers.append(nc.addObserver(forName: .dmFindPrev,         object: nil, queue: .main) { [weak self] _ in self?.performFinder(.previousMatch) })
-            observers.append(nc.addObserver(forName: .dmFindSetSelection, object: nil, queue: .main) { [weak self] _ in self?.performFinder(.setSearchString) })
+        func installCommandObserver() {
+            commandObserver = NotificationCenter.default.addObserver(
+                forName: EditorCommand.notification, object: nil, queue: .main
+            ) { [weak self] notification in
+                guard let self, let command = EditorCommand(notification) else { return }
+                self.perform(command)
+            }
         }
 
-        private func performFinder(_ action: NSTextFinder.Action) {
-            guard isOurWindowActive, let textView = textView else { return }
-            let item = NSMenuItem()
-            item.tag = action.rawValue
-            textView.performTextFinderAction(item)
+        /// Commands are broadcast to every editor; only the key window acts.
+        private func perform(_ command: EditorCommand) {
+            guard let textView, textView.window?.isKeyWindow == true else { return }
+            switch command {
+            case .zoomIn:        handleZoom(delta: 1)
+            case .zoomOut:       handleZoom(delta: -1)
+            case .zoomReset:     setFontSize(AppSettings.baseFontSize)
+            case .showFontPanel: showFontPanel(for: textView)
+            case .toggleWrap:
+                parent.wordWrap.toggle()
+                AppSettings.shared.wordWrap = parent.wordWrap
+            case .find(let action):
+                let item = NSMenuItem()
+                item.tag = action.rawValue
+                textView.performTextFinderAction(item)
+            }
         }
 
-        private var isOurWindowActive: Bool {
-            textView?.window?.isKeyWindow ?? false
-        }
-
-        private func menuZoomIn()    { if isOurWindowActive { handleZoom(delta: 1) } }
-        private func menuZoomOut()   { if isOurWindowActive { handleZoom(delta: -1) } }
-        private func menuZoomReset() { if isOurWindowActive { setFontSize(14) } }
-        private func menuToggleWordWrap() { if isOurWindowActive { parent.wordWrap.toggle(); AppSettings.shared.wordWrap = parent.wordWrap } }
-
-        private func menuShowFontPanel() {
-            guard isOurWindowActive, let textView = textView else { return }
+        private func showFontPanel(for textView: NSTextView) {
             let manager = NSFontManager.shared
             manager.setSelectedFont(textView.font ?? .systemFont(ofSize: parent.fontSize), isMultiple: false)
             manager.target = self
@@ -184,11 +178,11 @@ struct TextEditorView: NSViewRepresentable {
             let manager = (sender as? NSFontManager) ?? NSFontManager.shared
             guard let textView = textView else { return }
             let current = textView.font ?? .systemFont(ofSize: parent.fontSize)
-            let new = manager.convert(current)
-            let clamped = max(8, min(72, new.pointSize))
-            let finalFont = (clamped == new.pointSize)
-                ? new
-                : NSFontManager.shared.convert(new, toSize: clamped)
+            let converted = manager.convert(current)
+            let clamped = Self.clampFontSize(converted.pointSize)
+            let finalFont = (clamped == converted.pointSize)
+                ? converted
+                : manager.convert(converted, toSize: clamped)
             textView.font = finalFont
             parent.fontName = finalFont.fontName
             parent.fontSize = finalFont.pointSize
@@ -203,10 +197,14 @@ struct TextEditorView: NSViewRepresentable {
         }
 
         private func setFontSize(_ size: CGFloat) {
-            let clamped = max(8, min(72, size))
+            let clamped = Self.clampFontSize(size)
             guard clamped != parent.fontSize else { return }
             parent.fontSize = clamped
             AppSettings.shared.defaultFontSize = clamped
+        }
+
+        private static func clampFontSize(_ size: CGFloat) -> CGFloat {
+            min(max(size, AppSettings.fontSizeRange.lowerBound), AppSettings.fontSizeRange.upperBound)
         }
 
         // MARK: - Word wrap
@@ -249,11 +247,11 @@ struct TextEditorView: NSViewRepresentable {
             // Skip propagating the binding while IME composition is active.
             // Re-rendering SwiftUI during composition wipes out the marked text.
             if textView.hasMarkedText() {
-                recomputeAll()
+                recomputeMetrics()
                 return
             }
             parent.text = textView.string
-            recomputeAll()
+            recomputeMetrics()
         }
 
         func textViewDidChangeSelection(_ notification: Notification) {
@@ -261,65 +259,15 @@ struct TextEditorView: NSViewRepresentable {
             // Avoid triggering re-render storms while IME is composing — the
             // selection moves a lot inside the marked range.
             if textView.hasMarkedText() { return }
-            recomputeCursor()
+            recomputeMetrics()
         }
 
-        // MARK: - Counts
+        // MARK: - Status bar metrics
 
-        func recomputeAll() {
-            recomputeCounts()
-            recomputeCursor()
-        }
-
-        private func recomputeCounts() {
+        func recomputeMetrics() {
             guard let textView = textView else { return }
-            let text = textView.string
-            parent.charCount = text.count
-            var lines = 1
-            for scalar in text.unicodeScalars where scalar.value == 0x0A {
-                lines += 1
-            }
-            parent.lineCount = lines
-        }
-
-        private func recomputeCursor() {
-            guard let textView = textView else { return }
-            let str = textView.string as NSString
-            let range = textView.selectedRange()
-            let loc = min(range.location, str.length)
-
-            var line = 1
-            var lineStart = 0
-            var i = 0
-            while i < loc {
-                if str.character(at: i) == 0x0A {
-                    line += 1
-                    lineStart = i + 1
-                }
-                i += 1
-            }
-            parent.cursorLine = line
-            parent.cursorCol = loc - lineStart + 1
-
-            if range.length > 0 {
-                let sel = str.substring(with: range)
-                parent.selectionCount = sel.count
-            } else {
-                parent.selectionCount = 0
-            }
+            let metrics = EditorMetrics(string: textView.string as NSString, selection: textView.selectedRange())
+            if metrics != parent.metrics { parent.metrics = metrics }
         }
     }
-}
-
-extension Notification.Name {
-    static let dmZoomIn     = Notification.Name("DosMemo.zoomIn")
-    static let dmZoomOut    = Notification.Name("DosMemo.zoomOut")
-    static let dmZoomReset  = Notification.Name("DosMemo.zoomReset")
-    static let dmShowFont   = Notification.Name("DosMemo.showFontPanel")
-    static let dmToggleWrap = Notification.Name("DosMemo.toggleWrap")
-    static let dmFind             = Notification.Name("DosMemo.find")
-    static let dmReplace          = Notification.Name("DosMemo.replace")
-    static let dmFindNext         = Notification.Name("DosMemo.findNext")
-    static let dmFindPrev         = Notification.Name("DosMemo.findPrev")
-    static let dmFindSetSelection = Notification.Name("DosMemo.findSetSelection")
 }
